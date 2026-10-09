@@ -1,20 +1,11 @@
-# PartPenny V2 — comparison engine foundation
+PartPenny V2.1 — Cloudflare Search Connection
 
-This version retains V1 vehicle search and saved garage, and adds an actual-listing results renderer. **It does not provide live prices without an authorized inventory API.** It never fabricates prices.
+Upload index.html to the ROOT of your GitHub repository (replace the existing index.html).
 
-## Run
-Open `index.html` or publish to GitHub Pages. Without a backend, search results display clearly labeled links to retailers and salvage sites.
+The website calls https://partpenny.jaime-torres-1731.workers.dev/api/search and supports the current Worker response shape (results: []).
 
-## Connect an authorized comparison API
-In the browser developer console, configure a backend URL (only use a trusted endpoint):
+Test: Enter year, make, model, and part; click Compare available listings. Expected: PartPenny API connected successfully; 0 sources checked. Retailer search links remain usable.
 
-`localStorage.setItem('partpenny-api-url', 'https://YOUR-API-HOST.example')`
+IMPORTANT: No live retailer price feeds or fitment verification exist yet. Do not interpret this as live comparison.
 
-The frontend sends GET `/api/search` with query parameters `year`, `make`, `model`, `engine`, `part`, `zip`, `condition`, and `radius`. Backend must enable CORS for the frontend origin.
-
-Expected JSON: `{ "listings": [{"seller":"Example","title":"Part title","condition":"used","location":"Online","shippingLabel":"$8 shipping","totalPrice":72.00,"taxIncluded":false,"fitment":"verified","availability":"in_stock","url":"https://seller.example/item"}] }`
-
-Only records with `fitment: verified`, `availability: in_stock`, valid nonnegative `totalPrice`, and HTTPS URL are displayed. The backend is responsible for validating genuine availability, vehicle fitment, tax/shipping/core charges, and retailer authorization. No provider credentials should be placed in the static site. If shipping or fees cannot be determined, the backend should not label `totalPrice` as complete.
-
-## Next milestone
-Secure legitimate inventory access (e.g. approved marketplace developer API), build the backend, validate fitment and cost fields, and test live search. No real retailer API access is included in this ZIP.
+No secrets are included. Garage data stays in browser storage.
