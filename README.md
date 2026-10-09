@@ -1,18 +1,14 @@
-# PartPenny V3.3 — Combined vehicle details + first catalog integration
+# PartPenny V3.4
 
-## Important
-This includes V3.2 trim/engine improvements. Do not install V3.2 separately.
+## Deploy in order
+1. Cloudflare dashboard > Workers & Pages > existing PartPenny Worker > Edit code. Replace its entire script with `cloudflare-worker.js`, then **Deploy**. Keep the existing Worker URL.
+2. Test `/` and `/api/search?year=2024&make=Ford&model=Ranger&part=LED%20tailgate%20light%20bar&condition=new`. Results depend on live Putco catalog and vehicle applications.
+3. GitHub repo `partpenny/Partpenny`: replace root `index.html` with this file and commit. Keep GitHub Pages configuration unchanged.
 
-## Installation (two deployments)
-1. Cloudflare Dashboard → your `partpenny` Worker → Edit code: replace the current code with `cloudflare-worker.js`, then Deploy.
-2. Test `/` (version 3.3) and `/api/search?year=2013&make=Toyota&model=Avalon&part=engine`.
-3. In GitHub `Partpenny`, replace `index.html` with this ZIP's version and commit.
-4. Refresh the GitHub Pages website and test.
-
-## Limitations
-- Public catalog is Eskimo Auto & Truck Parts' remanufactured engines only; CAD prices.
-- First 500 catalog rows searched; pagination may include more.
-- Catalog field mappings are defensive but have not been validated against a live Cloudflare deployment. If no matches appear, inspect the catalog schema before modifying mapping.
-- No verified fitment or stock, no USD conversion, no shipping/tax/core total, and no confirmed lowest available price. The UI separates catalog candidates from verified listings.
-- Manufacturer/model suggestions use NHTSA. Trim and engine suggestions use saved vehicles or VIN decoding when available, not a comprehensive catalog.
-- Do not put API secrets in GitHub. No credentials needed for this public catalog.
+## Notes
+- Putco: officially documented public AI integration API, new truck accessories; year/make/model matches with configuration restrictions, not guaranteed exact trim fitment.
+- Eskimo: remanufactured engine catalog; CAD reference prices, fitment and stock unverified.
+- Mechanical parts: direct search links only until an authorized pricing source is available. No invented prices.
+- No API key, paid service, or additional account required.
+- Published prices are not total delivered prices; no cross-currency cheapest claim.
+- Existing make/model autocomplete and saved garage preserved.
