@@ -1,4 +1,4 @@
-// PartPenny V3.3 — Cloudflare Worker (free tier)
+// PartPenny V3.5 — Cloudflare Worker (free tier)
 // First source: Eskimo Auto & Truck Parts public remanufactured engine catalog.
 // The catalog publishes CAD engine prices, NOT verified stock or US landed costs.
 const ALLOWED_ORIGIN = 'https://partpenny.github.io';
@@ -15,18 +15,20 @@ function respond(body, status=200) {
 }
 function pick(obj, keys) {for(const key of keys){const v=obj?.[key];if(v!==undefined&&v!==null&&v!=='')return v;}return null;}
 function text(v){return String(v??'').toLowerCase().trim();}
-function money(v){if(typeof v==='number')return Number.isFinite(v)?v:null;if(typeof v==='string'){const n=Number(v.replace(/[$,\s]/g,''));return Number.isFinite(n)?n:null;}return null;}
+function money(v){if(typeof v==='number')return Number.isFinite(v)?v:null;if(typeof v==='string'){const n=Number(v.replace(/\b(?:USD|CAD)\b/gi,'').replace(/[$,\s]/g,''));return Number.isFinite(n)?n:null;}return null;}
 function rowsFrom(j){for(const key of ['engines','products','items','results','data','catalog']){if(Array.isArray(j?.[key]))return j[key];}return Array.isArray(j)?j:[];}
 export default {async fetch(request){
   if(request.method==='OPTIONS')return new Response(null,{status:204,headers:{'Access-Control-Allow-Origin':ALLOWED_ORIGIN,'Access-Control-Allow-Methods':'GET, OPTIONS','Access-Control-Allow-Headers':'Content-Type'}});
   if(request.method!=='GET')return respond({error:'Method not allowed'},405);
   const url=new URL(request.url);
-  if(url.pathname==='/')return respond({application:'PartPenny',status:'online',version:'3.4',message:'Search API online; Putco and Eskimo catalog integrations enabled'});
+  if(url.pathname==='/')return respond({application:'PartPenny',status:'online',version:'3.5',message:'Search API online; Putco and Eskimo catalog integrations enabled'});
   if(url.pathname!=='/api/search')return respond({error:'Endpoint not found'},404);
   const year=url.searchParams.get('year')?.trim();const make=url.searchParams.get('make')?.trim();const model=url.searchParams.get('model')?.trim();const part=url.searchParams.get('part')?.trim();
   if(!year||!make||!model||!part)return respond({error:'Vehicle and part required'},400);
+  if(!/^(19[5-9]\d|20\d\d)$/.test(year)||Number(year)>new Date().getUTCFullYear()+1||make.length>70||model.length>90||part.length>100)return respond({error:'Invalid vehicle or part search'},400);
   const base={vehicle:{year,make,model},requestedPart:part,results:[],listings:[],sourcesChecked:0,candidates:[]};
   const condition=text(url.searchParams.get('condition'));
+  if(!['','new','used','remanufactured'].includes(condition))return respond({error:'Invalid condition'},400);
   const enginePart=/\b(engine|motor|long block|short block)\b/i.test(part);
   const tasks=[];
   if(enginePart && (!condition || condition==='remanufactured')) tasks.push((async()=>{

@@ -1,14 +1,22 @@
-# PartPenny V3.4
+# PartPenny V3.5 — honest comparison improvements
 
-## Deploy in order
-1. Cloudflare dashboard > Workers & Pages > existing PartPenny Worker > Edit code. Replace its entire script with `cloudflare-worker.js`, then **Deploy**. Keep the existing Worker URL.
-2. Test `/` and `/api/search?year=2024&make=Ford&model=Ranger&part=LED%20tailgate%20light%20bar&condition=new`. Results depend on live Putco catalog and vehicle applications.
-3. GitHub repo `partpenny/Partpenny`: replace root `index.html` with this file and commit. Keep GitHub Pages configuration unchanged.
+## Deploy order
+1. Cloudflare Workers & Pages → existing PartPenny Worker → Edit Code: replace all code with `cloudflare-worker.js` and deploy. The Worker should return `version: 3.5` at its root URL.
+2. GitHub repo `partpenny/Partpenny`: replace the root `index.html` with the supplied file and commit. Do not upload the ZIP itself.
+3. Open https://partpenny.github.io/Partpenny/ and hard-refresh (Ctrl+Shift+R).
 
-## Notes
-- Putco: officially documented public AI integration API, new truck accessories; year/make/model matches with configuration restrictions, not guaranteed exact trim fitment.
-- Eskimo: remanufactured engine catalog; CAD reference prices, fitment and stock unverified.
-- Mechanical parts: direct search links only until an authorized pricing source is available. No invented prices.
-- No API key, paid service, or additional account required.
-- Published prices are not total delivered prices; no cross-currency cheapest claim.
-- Existing make/model autocomplete and saved garage preserved.
+## Changes
+- Catalog prices sorted ascending **within each currency**. CAD and USD are not falsely compared.
+- More explicit source failures and incomplete catalog pagination warnings.
+- Clear warnings that listed prices exclude unknown delivery, taxes, and possible core deposits.
+- Added direct AutoZone and NAPA search destinations for common mechanical parts alongside RockAuto and Car-Part.com. These are retailer **links**, not live pricing integrations.
+- Worker input and condition validation; existing Putco and Eskimo logic retained.
+
+## Smoke tests
+- 2024 Ford Ranger / tailgate light bar / All conditions: Putco prices may appear.
+- 2015 Ford F-150 / engine / All conditions: Eskimo CAD engine price may appear.
+- 2015 Ford F-150 / alternator / All conditions: no fabricated price; retailer links available.
+- Used condition on a Putco-only accessory: no misleading New price.
+
+## Limitations
+No authorized, no-account live price feed for common mechanical parts was verified. Retailer links are not scraped. Product fitment and final checkout costs remain unverified. Do not claim nationwide cheapest pricing.
